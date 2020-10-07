@@ -1,13 +1,51 @@
-import httpie
+import requests
 import logging, sys
+import json
 
-logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
+logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 class Client:
+
+    URL = 'http://localhost:8000/NameServer'
+
+    headers_get = {'Content-type': 'application/json',
+               'Accept': 'text/plain',
+               'Content-Encoding': 'utf-8'}
+    headers_post = {'Accept': 'text/plain',
+               'enctype': "multipart/form-data",
+               'Content-Encoding': 'utf-8'}
+
+    current_dir = '/'
 
     def __init__(self):
         logging.info('  Initialization of a client')
         return
+
+    def send_request(self, args: list):
+        data = {i: args[i] for i in range(len(args))}
+        answer = requests.get(url=self.URL,
+                              params=data,
+                              headers=self.headers_get)
+        logging.info(answer)
+        return answer
+
+    def conc_dir(self, path1, path2):
+        answer = path1
+        if path2[0] == '/':
+            answer = path2
+            if path2[len(path2) - 1] != '/':
+                answer += '/'
+        elif path2 == '.':
+            answer = path1
+        elif path2 == '..':
+            if path1.count('/') > 1:
+                answer = path1[:
+                    path1[:-1].rfind('/') + 1]
+        else:
+            answer = path1 + path2
+            if path2[len(path2) - 1] != '/':
+                answer += '/'
+        return answer
 
     def initialize(self, args):
         # 'init', host, username, password
@@ -17,6 +55,8 @@ class Client:
         if len(args) != 4:
             logging.error(" Incorrect number of arguments")
             return
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
     def create_file(self, args):
@@ -26,6 +66,9 @@ class Client:
         if len(args) != 3:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
     def read_file(self, args):
@@ -35,13 +78,28 @@ class Client:
         if len(args) != 3:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
     def write_file(self, args):
-
+        # 'write', path, filename, path_to_file
         logging.info('  Writing file')
         logging.info('      arguments: ' + str(args))
+        if len(args) != 4:
+            logging.error(" Incorrect number of arguments")
+            return
+        args[1] = self.conc_dir(self.current_dir, args[1])
 
+        file = {'args' : args, 'file' : open(args[3], 'r')}
+
+        data = {i: args[i] for i in range(len(args))}
+        answer = requests.post(url=self.URL+'/',
+                              params = data,
+                              files = file,
+                              headers=self.headers_post )
+        logging.info(answer)
 
     def delete_file(self, args):
         # 'delete', path, filename
@@ -50,6 +108,9 @@ class Client:
         if len(args) != 3:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
     def info_file(self, args):
@@ -59,6 +120,9 @@ class Client:
         if len(args) != 3:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
 
@@ -70,6 +134,10 @@ class Client:
         if len(args) != 5:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        args[3] = self.conc_dir(self.current_dir, args[3])
+        answer = self.send_request(args)
+        logging.info(answer)
         pass
 
     def move_file(self, args):
@@ -79,6 +147,10 @@ class Client:
         if len(args) != 5:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        args[3] = self.conc_dir(self.current_dir, args[3])
+        answer = self.send_request(args)
+        answer = self.send_request(args)
         pass
 
     def open_directory(self, args):
@@ -88,7 +160,12 @@ class Client:
         if len(args) != 2:
             logging.error(" Incorrect number of arguments")
             return
-        pass
+
+        self.current_dir = self.conc_dir(
+            self.current_dir, args[1])
+
+        logging.info('  Your current directory is '
+                     + self.current_dir)
 
     def read_directory(self, args):
         # 'readdir', path
@@ -97,6 +174,9 @@ class Client:
         if len(args) != 2:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        answer = self.send_request(args)
         pass
 
     def make_directory(self, args):
@@ -106,6 +186,8 @@ class Client:
         if len(args) != 3:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
         pass
 
     def delete_directory(self, args):
@@ -115,6 +197,9 @@ class Client:
         if len(args) != 2:
             logging.error(" Incorrect number of arguments")
             return
+        args[1] = self.conc_dir(self.current_dir, args[1])
+        answer = self.send_request(args)
+        answer = self.send_request(args)
         pass
 
     operations = {
@@ -165,10 +250,12 @@ class Client:
             maybe_func(self, args)
 
             args = input()
+            while (len(args) == 0):
+                args = input()
 
 
 if __name__ == '__main__':
-    # Spot in mode user wants to run the program
+    # Spot which mode user wants to run the program
     # (command - line or interactive)
 
     client = Client()
