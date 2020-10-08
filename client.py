@@ -12,7 +12,7 @@ class Client:
                'Accept': 'text/plain',
                'Content-Encoding': 'utf-8'}
     headers_post = {'Accept': 'text/plain',
-               'enctype': "multipart/form-data",
+               'enctype': 'multipart/form-data',
                'Content-Encoding': 'utf-8'}
 
     current_dir = '/'
@@ -92,13 +92,15 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
 
-        file = {'args' : args, 'file' : open(args[3], 'r')}
-
+        file = {'file' : open(args[3], 'rb')}
+        print(file)
         data = {i: args[i] for i in range(len(args))}
+        print(data)
         answer = requests.post(url=self.URL+'/',
                               params = data,
                               files = file,
-                              headers=self.headers_post )
+                              headers=self.headers_post
+                            )
         logging.info(answer)
 
     def delete_file(self, args):
