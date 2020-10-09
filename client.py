@@ -48,7 +48,7 @@ class Client:
         return answer
 
     def initialize(self, args):
-        # 'init', host, username, password
+        # 'init'
         logging.info('  Initialization of storage')
         logging.info('      arguments: ' + str(args))
 
@@ -139,10 +139,10 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info(answer.txt)
+        logging.info(answer.text)
 
     def move_file(self, args):
-        # 'copy', path, filename, new_path, new_filename
+        # 'move', path, filename, new_path, new_filename
         logging.info('  Moving file')
         logging.info('      arguments: ' + str(args))
         if len(args) != 5:
@@ -201,6 +201,90 @@ class Client:
         logging.info("Return :", answer.text)
         pass
 
+    def _print_help(self, command = None):
+        help_dict = {
+            'init' :    '''       'init'   
+                  Reinitialize an existing distributed storage"
+            ''',
+            'create':   '''       'create', path, filename
+                  create file 'filename' in remote directory 'path'
+            ''',
+            'write':    '''       'write', path, filename, filepath
+                  copy local file 'filepath' to remote directory
+                  'path' into file 'filename'
+            ''',
+            'info':     '''       'info', path, filename
+                  get filesize of remote file 'filename' in 'path'
+                  directory
+            ''',
+            'delete':   '''       'delete', path, filename
+                  delete remote file 'filename' from directory 'path'
+            ''',
+            'read':     '''       'read', path, filename, filepath
+                  copy remote file 'filename' in 'path' directory
+                  to local file 'filepath'
+            ''',
+            'copy':     '''       'copy', path, filename, new_path, new_filename
+                  copy remote file 'filename' at directory 'path'
+                  to remote file 'new_filename' at directory 
+                  'new_path'
+            ''',
+            'move':     '''       'move', path, filename, new_path, new_filename
+                  move remote file 'filename' at directory 'path'
+                  to remote file 'new_filename' at directory 'new_path'
+            ''',
+            'opendir':  '''       'opendir', path
+                  open remote directory 'path'
+            ''',
+            'readdir':  '''        'readdir', path
+                  read remote directory 'path'
+            ''',
+            'makedir':  '''        'makedir', path, dirname
+                  make remote directory 'dirname' in directory 
+                  'path'
+            ''',
+            'deletedir':'''        'deletedir', path
+                  delete remote directory 'path'
+            ''',
+            'help':     '''        'help', optional(operation name)
+            '''
+
+        }
+        if (command!=None):
+            if (command in help_dict):
+                logging.info(
+                    '\n' + "".join(word.ljust(10) for word in
+                                   [command, help_dict[command]])
+                )
+                return
+            else:
+                logging.info('  Command ' + command + ' does not exist')
+                return
+
+        commands = ['init', 'create', 'write', 'info', 'delete', 'read',
+                   'copy', 'move', 'opendir', 'readdir', 'makedir',
+                   'deletedir', 'help']
+
+        msg = ''
+        for i in range(len(commands)):
+            msg+='\n' + "".join(word.ljust(10) for word in
+                                 [commands[i], help_dict[commands[i]]])
+        logging.info(msg)
+        return
+
+    def help(self, args):
+        logging.info('  Describing possible commands:')
+        logging.info('      arguments: ' + str(args))
+        if len(args) != 1 and len(args) != 2:
+            logging.error(' Incorrect number of arguments')
+            logging.info('  Use command "help" with 0 arguments to see more')
+            return
+        if len(args) == 1:
+            self._print_help()
+            return
+        if len(args) == 2:
+            self._print_help(args[1])
+
     operations = {
         'init': initialize,
         'create': create_file,
@@ -210,6 +294,7 @@ class Client:
         'info': info_file,
         'copy': copy_file,
         'move': move_file,
+        'help': help,
         'opendir': open_directory,
         'readdir': read_directory,
         'makedir': make_directory,
@@ -240,14 +325,14 @@ class Client:
         args = input()
         while (args.lower() != 'exit'
                and args.lower() != 'exit()'):
-            args = args.split()
-            op = args[0].lower()
+            if (len(args)!=0):
+                args = args.split()
+                op = args[0].lower()
 
-            maybe_func = self.parse_operation(op)
-            if type(maybe_func) == str:
-                exit()
-            maybe_func(self, args)
-
+                maybe_func = self.parse_operation(op)
+                if type(maybe_func) == str:
+                    exit()
+                maybe_func(self, args)
             args = input()
             while (len(args) == 0):
                 args = input()
