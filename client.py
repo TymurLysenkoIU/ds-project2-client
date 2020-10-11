@@ -6,7 +6,7 @@ logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 class Client:
 
-    URL = 'http://localhost:8000/NameServer'
+    URL = 'http://localhost:8000/command'
 
     headers_get = {'Content-type': 'application/json',
                'Accept': 'text/plain',
