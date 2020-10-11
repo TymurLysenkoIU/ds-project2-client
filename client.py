@@ -4,16 +4,16 @@ import json
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
-class Client:
 
+class Client:
     URL = 'http://localhost:8000/command'
 
     headers_get = {'Content-type': 'application/json',
-               'Accept': 'text/plain',
-               'Content-Encoding': 'utf-8'}
+                   'Accept': 'text/plain',
+                   'Content-Encoding': 'utf-8'}
     headers_post = {'Accept': 'text/plain',
-               'enctype': 'multipart/form-data',
-               'Content-Encoding': 'utf-8'}
+                    'enctype': 'multipart/form-data',
+                    'Content-Encoding': 'utf-8'}
 
     current_dir = '/'
 
@@ -40,7 +40,7 @@ class Client:
         elif path2 == '..':
             if path1.count('/') > 1:
                 answer = path1[:
-                    path1[:-1].rfind('/') + 1]
+                               path1[:-1].rfind('/') + 1]
         else:
             answer = path1 + path2
             if path2[len(path2) - 1] != '/':
@@ -78,10 +78,9 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args[:-1])
-        #logging.info(answer.text)
+        # logging.info(answer.text)
         with open(args[-1], 'wb') as file:
             file.write(answer.content)
-
 
     def write_file(self, args):
         # 'write', path, filename, path_to_file
@@ -92,13 +91,13 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
 
-        file = {'file' : open(args[3], 'rb')}
+        file = {'file': open(args[3], 'rb')}
         data = {i: args[i] for i in range(len(args))}
-        answer = requests.post(url=self.URL+'/',
-                              params = data,
-                              files = file,
-                              headers=self.headers_post
-                            )
+        answer = requests.post(url=self.URL + '/',
+                               params=data,
+                               files=file,
+                               headers=self.headers_post
+                               )
         logging.info(answer.text)
 
     def delete_file(self, args):
@@ -122,7 +121,6 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
         logging.info(answer.text)
-
 
     def copy_file(self, args):
         # 'copy', path, filename, new_path, new_filename
@@ -197,57 +195,57 @@ class Client:
         answer = self.send_request(args)
         logging.info("Return :" + answer.text)
 
-    def _print_help(self, command = None):
+    def _print_help(self, command=None):
         help_dict = {
-            'init' :    '''       'init'   
+            'init': '''       'init'   
                   Reinitialize an existing distributed storage"
             ''',
-            'create':   '''       'create', path, filename
+            'create': '''       'create', path, filename
                   create file 'filename' in remote directory 'path'
             ''',
-            'write':    '''       'write', path, filename, filepath
+            'write': '''       'write', path, filename, filepath
                   copy local file 'filepath' to remote directory
                   'path' into file 'filename'
             ''',
-            'info':     '''       'info', path, filename
+            'info': '''       'info', path, filename
                   get filesize of remote file 'filename' in 'path'
                   directory
             ''',
-            'delete':   '''       'delete', path, filename
+            'delete': '''       'delete', path, filename
                   delete remote file 'filename' from directory 'path'
             ''',
-            'read':     '''       'read', path, filename, filepath
+            'read': '''       'read', path, filename, filepath
                   copy remote file 'filename' in 'path' directory
                   to local file 'filepath'
             ''',
-            'copy':     '''       'copy', path, filename, new_path, new_filename
+            'copy': '''       'copy', path, filename, new_path, new_filename
                   copy remote file 'filename' at directory 'path'
                   to remote file 'new_filename' at directory 
                   'new_path'
             ''',
-            'move':     '''       'move', path, filename, new_path, new_filename
+            'move': '''       'move', path, filename, new_path, new_filename
                   move remote file 'filename' at directory 'path'
                   to remote file 'new_filename' at directory 'new_path'
             ''',
-            'opendir':  '''       'opendir', path
+            'opendir': '''       'opendir', path
                   open remote directory 'path'
             ''',
-            'readdir':  '''        'readdir', path
+            'readdir': '''        'readdir', path
                   read remote directory 'path'
             ''',
-            'makedir':  '''        'makedir', path, dirname
+            'makedir': '''        'makedir', path, dirname
                   make remote directory 'dirname' in directory 
                   'path'
             ''',
-            'deletedir':'''        'deletedir', path
+            'deletedir': '''        'deletedir', path
                   delete remote directory 'path'
             ''',
-            'help':     '''        'help', optional(operation name)
+            'help': '''        'help', optional(operation name)
             '''
 
         }
-        if (command!=None):
-            if (command in help_dict):
+        if command is not None:
+            if command in help_dict:
                 logging.info(
                     '\n' + "".join(word.ljust(10) for word in
                                    [command, help_dict[command]])
@@ -258,13 +256,13 @@ class Client:
                 return
 
         commands = ['init', 'create', 'write', 'info', 'delete', 'read',
-                   'copy', 'move', 'opendir', 'readdir', 'makedir',
-                   'deletedir', 'help']
+                    'copy', 'move', 'opendir', 'readdir', 'makedir',
+                    'deletedir', 'help']
 
         msg = ''
         for i in range(len(commands)):
-            msg+='\n' + "".join(word.ljust(10) for word in
-                                 [commands[i], help_dict[commands[i]]])
+            msg += '\n' + "".join(word.ljust(10) for word in
+                                  [commands[i], help_dict[commands[i]]])
         logging.info(msg)
         return
 
@@ -302,8 +300,8 @@ class Client:
             func = self.operations[op]
             return func
         except:
-            logging.info('Incorrect operation '+op)
-            return "No such operation "+op
+            logging.info('Incorrect operation ' + op)
+            return "No such operation " + op
 
     def command_line_mode(self):
         # read command line arguments
@@ -316,12 +314,11 @@ class Client:
             exit()
         maybe_func(self, args[1:])
 
-
     def interactive_mode(self):
         args = input()
         while (args.lower() != 'exit'
                and args.lower() != 'exit()'):
-            if (len(args)!=0):
+            if len(args) != 0:
                 args = args.split()
                 op = args[0].lower()
 
@@ -330,7 +327,7 @@ class Client:
                     exit()
                 maybe_func(self, args)
             args = input()
-            while (len(args) == 0):
+            while len(args) == 0:
                 args = input()
 
 
