@@ -2,7 +2,7 @@ import requests
 import logging, sys
 import json
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(stream=sys.stderr, level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
 class Client:
 
@@ -26,7 +26,7 @@ class Client:
         answer = requests.get(url=self.URL,
                               params=data,
                               headers=self.headers_get)
-        logging.info("Return :", answer.text)
+        logging.info("Return :" + answer.text)
         return answer
 
     def conc_dir(self, path1, path2):
@@ -56,7 +56,7 @@ class Client:
             logging.error(" Incorrect number of arguments")
             return
         answer = self.send_request(args)
-        logging.info("Return :", answer.text)
+        logging.info("Return :" + answer.text)
 
     def create_file(self, args):
         # 'create', path, filename
@@ -68,7 +68,6 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
         logging.info(answer)
-        pass
 
     def read_file(self, args):
         # 'read', path, filename, local_filename
@@ -94,9 +93,7 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
 
         file = {'file' : open(args[3], 'rb')}
-        print(file)
         data = {i: args[i] for i in range(len(args))}
-        print(data)
         answer = requests.post(url=self.URL+'/',
                               params = data,
                               files = file,
@@ -151,7 +148,7 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info("Return :", answer.text)
+        logging.info("Return :" + answer.text)
 
     def open_directory(self, args):
         # 'opendir', path
@@ -187,7 +184,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("Return :", answer.text)
+        logging.info("Return :" + answer.text)
 
     def delete_directory(self, args):
         # 'deletedir', path
@@ -198,8 +195,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("Return :", answer.text)
-        pass
+        logging.info("Return :" + answer.text)
 
     def _print_help(self, command = None):
         help_dict = {
