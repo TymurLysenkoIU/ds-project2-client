@@ -26,7 +26,7 @@ class Client:
         answer = requests.get(url=self.URL,
                               params=data,
                               headers=self.headers_get)
-        logging.info("Return :" + answer.text)
+        logging.info("  Return : " + answer.text)
         return answer
 
     def conc_dir(self, path1, path2):
@@ -56,7 +56,7 @@ class Client:
             logging.error(" Incorrect number of arguments")
             return
         answer = self.send_request(args)
-        logging.info("Return :" + answer.text)
+        logging.info("  Return :" + answer.text)
 
     def create_file(self, args):
         # 'create', path, filename
@@ -78,9 +78,9 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args[:-1])
-        # logging.info(answer.text)
         with open(args[-1], 'wb') as file:
             file.write(answer.content)
+        logging.info("  Ready, check the file")
 
     def write_file(self, args):
         # 'write', path, filename, path_to_file
@@ -98,7 +98,7 @@ class Client:
                                files=file,
                                headers=self.headers_post
                                )
-        logging.info(answer.text)
+        logging.info("  Return: " + answer.text)
 
     def delete_file(self, args):
         # 'delete', path, filename
@@ -109,7 +109,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info(answer.text)
+        logging.info("  Return: " + answer.text)
 
     def info_file(self, args):
         # 'info', path, filename
@@ -120,7 +120,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info(answer.text)
+        logging.info("  Return: " + answer.text)
 
     def copy_file(self, args):
         # 'copy', path, filename, new_path, new_filename
@@ -134,7 +134,7 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info(answer.text)
+        logging.info("  Return: " + answer.text)
 
     def move_file(self, args):
         # 'move', path, filename, new_path, new_filename
@@ -146,7 +146,7 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info("Return :" + answer.text)
+        logging.info("  Return :" + answer.text)
 
     def open_directory(self, args):
         # 'opendir', path
@@ -171,7 +171,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        print(answer.text)
+        print("  Return: "+answer.text)
 
     def make_directory(self, args):
         # 'makedir', path, dirname
@@ -182,7 +182,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("Return :" + answer.text)
+        logging.info("  Return:" + answer.text)
 
     def delete_directory(self, args):
         # 'deletedir', path
@@ -193,7 +193,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("Return :" + answer.text)
+        logging.info("  Return: " + answer.text)
 
     def _print_help(self, command=None):
         help_dict = {
