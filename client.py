@@ -1,6 +1,5 @@
 import requests
 import logging, sys
-import json
 
 logging.basicConfig(stream=sys.stderr, level=logging.DEBUG, format='%(levelname)s: %(message)s')
 
@@ -26,7 +25,6 @@ class Client:
         answer = requests.get(url=self.URL,
                               params=data,
                               headers=self.headers_get)
-        logging.info("  Return : " + answer.text)
         return answer
 
     def conc_dir(self, path1, path2):
@@ -56,7 +54,7 @@ class Client:
             logging.error(" Incorrect number of arguments")
             return
         answer = self.send_request(args)
-        logging.info("  Return :" + answer.text)
+        logging.info("  Available space: " + answer.text)
 
     def create_file(self, args):
         # 'create', path, filename
@@ -67,7 +65,10 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info(answer)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
 
     def read_file(self, args):
         # 'read', path, filename, local_filename
@@ -98,7 +99,10 @@ class Client:
                                files=file,
                                headers=self.headers_post
                                )
-        logging.info("  Return: " + answer.text)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
 
     def delete_file(self, args):
         # 'delete', path, filename
@@ -109,7 +113,8 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("  Return: " + answer.text)
+        if answer.text == None:
+            logging.info("Success")
 
     def info_file(self, args):
         # 'info', path, filename
@@ -120,7 +125,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("  Return: " + answer.text)
+        logging.info("  Filesize: " + answer.text)
 
     def copy_file(self, args):
         # 'copy', path, filename, new_path, new_filename
@@ -134,7 +139,11 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info("  Return: " + answer.text)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
+
 
     def move_file(self, args):
         # 'move', path, filename, new_path, new_filename
@@ -146,7 +155,10 @@ class Client:
         args[1] = self.conc_dir(self.current_dir, args[1])
         args[3] = self.conc_dir(self.current_dir, args[3])
         answer = self.send_request(args)
-        logging.info("  Return :" + answer.text)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
 
     def open_directory(self, args):
         # 'opendir', path
@@ -171,7 +183,7 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        print("  Return: "+answer.text)
+        print("  Directory: "+answer.text)
 
     def make_directory(self, args):
         # 'makedir', path, dirname
@@ -182,7 +194,10 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("  Return:" + answer.text)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
 
     def delete_directory(self, args):
         # 'deletedir', path
@@ -193,7 +208,10 @@ class Client:
             return
         args[1] = self.conc_dir(self.current_dir, args[1])
         answer = self.send_request(args)
-        logging.info("  Return: " + answer.text)
+        if answer.text == None:
+            logging.info("Success")
+        else:
+            logging.info(answer.text)
 
     def _print_help(self, command=None):
         help_dict = {
