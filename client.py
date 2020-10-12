@@ -267,6 +267,7 @@ class Client:
         return
 
     def help(self, args):
+        # 'help', optional(operation name)
         logging.info('  Describing possible commands:')
         logging.info('      arguments: ' + str(args))
         if len(args) != 1 and len(args) != 2:
